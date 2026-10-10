@@ -1,62 +1,40 @@
 {
-  "name": "Customer",
+  "name": "Finance",
   "type": "object",
   "properties": {
     "tenant_id": {
       "type": "string"
     },
-    "name": {
-      "type": "string"
-    },
-    "customer_code": {
-      "type": "string"
-    },
-    "email": {
-      "type": "string"
-    },
-    "phone": {
-      "type": "string"
-    },
-    "address": {
-      "type": "string"
-    },
-    "package_id": {
-      "type": "string"
-    },
-    "package_name": {
-      "type": "string"
-    },
-    "service_type": {
+    "type": {
       "type": "string",
       "enum": [
-        "hotspot",
-        "pppoe"
-      ],
-      "default": "pppoe"
+        "income",
+        "expense"
+      ]
     },
-    "monthly_fee": {
+    "category": {
+      "type": "string"
+    },
+    "amount": {
       "type": "number"
     },
-    "status": {
-      "type": "string",
-      "enum": [
-        "active",
-        "suspended",
-        "isolated",
-        "terminated"
-      ],
-      "default": "active"
-    },
-    "install_date": {
+    "description": {
       "type": "string"
     },
-    "notes": {
+    "reference": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string"
+    },
+    "actor_name": {
       "type": "string"
     }
   },
   "required": [
     "tenant_id",
-    "name"
+    "type",
+    "amount"
   ],
   "rls": {
     "read": {
