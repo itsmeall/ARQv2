@@ -1,78 +1,64 @@
 {
-  "name": "Tenant",
+  "name": "TenantMember",
   "type": "object",
   "properties": {
+    "tenant_id": {
+      "type": "string"
+    },
     "name": {
       "type": "string"
     },
-    "code": {
+    "email": {
       "type": "string"
     },
-    "owner_name": {
+    "phone": {
       "type": "string"
     },
-    "contact_phone": {
-      "type": "string"
-    },
-    "contact_email": {
-      "type": "string"
-    },
-    "address": {
-      "type": "string"
-    },
-    "currency": {
+    "app_role": {
       "type": "string",
-      "default": "IDR"
+      "enum": [
+        "owner_admin",
+        "admin",
+        "reseller",
+        "technician",
+        "customer"
+      ]
+    },
+    "customer_id": {
+      "type": "string"
+    },
+    "commission_rate": {
+      "type": "number"
     },
     "status": {
       "type": "string",
       "enum": [
+        "invited",
         "active",
-        "trial",
         "suspended"
       ],
-      "default": "active"
+      "default": "invited"
     },
-    "plan": {
-      "type": "string",
-      "enum": [
-        "starter",
-        "business",
-        "enterprise"
-      ],
-      "default": "business"
-    },
-    "commission_enabled": {
-      "type": "boolean",
-      "default": true
-    },
-    "default_commission_rate": {
-      "type": "number",
-      "default": 10
-    },
-    "hotspot_portal_url": {
+    "invited_by_name": {
       "type": "string"
     },
-    "hotspot_dns_name": {
+    "joined_date": {
       "type": "string"
-    },
-    "default_voucher_expiry_hours": {
-      "type": "number",
-      "default": 24
     },
     "notes": {
       "type": "string"
     }
   },
   "required": [
-    "name",
-    "code"
+    "tenant_id",
+    "email",
+    "app_role"
   ],
   "rls": {
     "read": {
       "$or": [
         {
-          "id": "{{user.data.tenant_id}}"
+          "data.tenant_id": "{{user.data.tenant_id}}"
         },
         {
           "user_condition": {
@@ -87,16 +73,9 @@
       }
     },
     "update": {
-      "$or": [
-        {
-          "id": "{{user.data.tenant_id}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
+      "user_condition": {
+        "role": "admin"
+      }
     },
     "delete": {
       "user_condition": {

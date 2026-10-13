@@ -1,46 +1,78 @@
 {
-  "name": "Finance",
+  "name": "Invoice",
   "type": "object",
   "properties": {
     "tenant_id": {
       "type": "string"
     },
-    "type": {
-      "type": "string",
-      "enum": [
-        "income",
-        "expense"
-      ]
+    "customer_id": {
+      "type": "string"
     },
-    "category": {
+    "customer_name": {
+      "type": "string"
+    },
+    "invoice_number": {
+      "type": "string"
+    },
+    "period": {
       "type": "string"
     },
     "amount": {
       "type": "number"
     },
-    "description": {
+    "discount": {
+      "type": "number",
+      "default": 0
+    },
+    "total": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "unpaid",
+        "paid",
+        "overdue",
+        "void"
+      ],
+      "default": "unpaid"
+    },
+    "issue_date": {
       "type": "string"
     },
-    "reference": {
+    "due_date": {
       "type": "string"
     },
-    "date": {
+    "paid_date": {
       "type": "string"
     },
-    "actor_name": {
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "cash",
+        "transfer",
+        "qris",
+        "other"
+      ]
+    },
+    "notes": {
       "type": "string"
     }
   },
   "required": [
     "tenant_id",
-    "type",
-    "amount"
+    "customer_id",
+    "invoice_number",
+    "total"
   ],
   "rls": {
     "read": {
       "$or": [
         {
           "data.tenant_id": "{{user.data.tenant_id}}"
+        },
+        {
+          "data.customer_id": "{{user.data.customer_id}}"
         },
         {
           "user_condition": {

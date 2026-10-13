@@ -1,0 +1,132 @@
+{
+  "name": "VoucherBatch",
+  "type": "object",
+  "properties": {
+    "tenant_id": {
+      "type": "string"
+    },
+    "package_id": {
+      "type": "string"
+    },
+    "package_name": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "quantity": {
+      "type": "number"
+    },
+    "prefix": {
+      "type": "string"
+    },
+    "code_length": {
+      "type": "number"
+    },
+    "price": {
+      "type": "number"
+    },
+    "cost": {
+      "type": "number"
+    },
+    "expiry_hours": {
+      "type": "number"
+    },
+    "created_by_name": {
+      "type": "string"
+    },
+    "note": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "closed"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "tenant_id",
+    "package_id",
+    "quantity"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.tenant_id": "{{user.data.tenant_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$and": [
+        {
+          "data.tenant_id": {
+            "$ne": null
+          }
+        },
+        {
+          "$or": [
+            {
+              "data.tenant_id": "{{user.data.tenant_id}}"
+            },
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "update": {
+      "$and": [
+        {
+          "data.tenant_id": {
+            "$ne": null
+          }
+        },
+        {
+          "$or": [
+            {
+              "data.tenant_id": "{{user.data.tenant_id}}"
+            },
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "delete": {
+      "$and": [
+        {
+          "data.tenant_id": {
+            "$ne": null
+          }
+        },
+        {
+          "$or": [
+            {
+              "data.tenant_id": "{{user.data.tenant_id}}"
+            },
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
