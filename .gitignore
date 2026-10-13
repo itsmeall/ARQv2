@@ -1,0 +1,18 @@
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
+!api/.env.example
+api/config.local.php
+
+# Node and build output
+node_modules/
+dist/
+.vite/
+
+# Logs and local tooling
+*.log
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
