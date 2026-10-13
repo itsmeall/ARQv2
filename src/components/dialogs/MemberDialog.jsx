@@ -26,11 +26,13 @@ export default function MemberDialog({ open, onOpenChange, tenant, member, custo
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [inviteLink, setInviteLink] = useState('');
 
   useEffect(() => {
     if (open) {
       setError('');
       setNotice('');
+      setInviteLink('');
       setForm(
         member
           ? {
@@ -78,11 +80,12 @@ export default function MemberDialog({ open, onOpenChange, tenant, member, custo
         setError(data.error);
         return;
       }
-      if (data.invite_error) {
-        setNotice(`Anggota tersimpan, tetapi email undangan gagal dikirim (${data.invite_error}).`);
-      }
+      if (data.invite_url) {
+        setInviteLink(`${window.location.origin}${data.invite_url}`);
+        setNotice('Anggota tersimpan. Salin dan kirim tautan undangan melalui kanal yang disetujui.');
+      } else if (data.invite_error) setNotice(`Anggota tersimpan, tetapi email undangan gagal dikirim (${data.invite_error}).`);
       onSaved(data.member);
-      if (!data.invite_error) onOpenChange(false);
+      if (!data.invitation_token && !data.invite_error) onOpenChange(false);
     } catch (err) {
       setError(err.message || 'Gagal menyimpan anggota.');
     } finally {
@@ -96,7 +99,7 @@ export default function MemberDialog({ open, onOpenChange, tenant, member, custo
         <DialogHeader>
           <DialogTitle>{member ? 'Ubah akses anggota' : 'Tambah anggota & undang login'}</DialogTitle>
           <DialogDescription>
-            Anggota akan menerima email undangan dan hanya melihat menu sesuai perannya.
+            Anggota menggunakan Google dengan email undangan terverifikasi untuk mengaktifkan akses. Kirim tautan undangan yang tampil setelah disimpan.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
@@ -163,6 +166,12 @@ export default function MemberDialog({ open, onOpenChange, tenant, member, custo
           </div>
           {error ? <p className="text-sm font-medium text-destructive">{error}</p> : null}
           {notice ? <p className="text-sm font-medium text-amber-600">{notice}</p> : null}
+          {inviteLink ? (
+            <div className="flex gap-2">
+              <Input aria-label="Tautan undangan" value={inviteLink} readOnly />
+              <Button type="button" variant="outline" onClick={() => navigator.clipboard.writeText(inviteLink)}>Salin</Button>
+            </div>
+          ) : null}
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={busy}>
               Batal

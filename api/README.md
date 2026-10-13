@@ -30,10 +30,10 @@ All routes use JSON. Mutating requests require a `csrf_token` cookie and matchin
 
 ## Local setup
 
-Requires PHP 8.1+ with PDO MySQL, OpenSSL, and cURL. Configure environment variables outside the document root. Point the web server's `/api` path to `api/public/index.php` using the rewrite example in `api/public/.htaccess`. The API must be served over HTTPS outside localhost.
+Requires PHP 8.1+ with PDO MySQL, OpenSSL, and cURL. For local or isolated staging, copy `config.local.example.php` to the ignored `config.local.php` and fill only that environment's private settings. The front controller loads it; an already-set process environment variable takes precedence. For Hostinger, store the equivalent PHP configuration outside the served public directory and set `ARQ_CONFIG_FILE` to its path, or inject the values as server environment variables. Point `/api` through the front controller using [the deployment rewrite example](../deploy/hostinger.htaccess.example). The API must be served over HTTPS outside localhost.
 
 The first platform admin must be provisioned by an operator through a controlled database operation in a non-production environment first. The API intentionally contains no public admin-bootstrap endpoint.
 
 ## Current integration boundary
 
-ARQv2 pages still use Base44 entities for operational data and the current Base44 session context. Do not switch the frontend to this API until the operational entities and authorization checks have also been migrated to PHP endpoints. The Vite dev server can proxy `/api` to a local PHP server once that broader cutover is ready.
+Operational pages now call the PHP API through a Base44-compatible JavaScript adapter at `src/api/phpClient.js`; no Base44 SDK request is made. Vite proxies `/api` to the local PHP router in `api/router.php`. This integration is still a local implementation and is not ready for production until PHP checks, isolated staging import/reconciliation, and role-based acceptance tests are completed.

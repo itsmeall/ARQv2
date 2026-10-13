@@ -56,11 +56,16 @@ function verify_google_id_token(string $jwt, string $expectedNonce): array
     $clientId = (string)getenv('ARQ_GOOGLE_CLIENT_ID');
     $now = time();
     $audience = $claims['aud'] ?? null;
-    $audienceValid = is_string($audience) ? hash_equals($clientId, $audience) : (is_array($audience) && in_array($clientId, $audience, true));
+    $audienceValid = is_string($audience)
+        ? hash_equals($clientId, $audience)
+        : (is_array($audience)
+            && in_array($clientId, $audience, true)
+            && (count($audience) <= 1 || hash_equals($clientId, (string)($claims['azp'] ?? ''))));
     if (!in_array($claims['iss'] ?? '', ['https://accounts.google.com', 'accounts.google.com'], true)
+        || $clientId === ''
         || !$audienceValid
         || (isset($claims['azp']) && !hash_equals($clientId, (string)$claims['azp']))
-        || !isset($claims['exp'], $claims['iat'])
+        || !isset($claims['exp'], $claims['iat']) || !is_numeric($claims['exp']) || !is_numeric($claims['iat'])
         || (int)($claims['exp'] ?? 0) < $now || (int)($claims['iat'] ?? 0) > $now + 60
         || !hash_equals($expectedNonce, (string)($claims['nonce'] ?? ''))
         || ($claims['email_verified'] ?? false) !== true || empty($claims['sub']) || empty($claims['email'])) throw new RuntimeException('Google identity claims did not pass validation.');

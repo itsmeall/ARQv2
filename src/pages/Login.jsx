@@ -17,6 +17,10 @@ export default function Login() {
   // Post-login destination (e.g. the MCP OAuth consent page sends users here
   // with returnTo so the grant flow can resume). Same-origin paths only.
   const returnTo = safeReturnTo();
+  const inviteToken = (() => {
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    return hash.get('invite_token') || hash.get('invite') || new URLSearchParams(window.location.search).get('invite_token') || '';
+  })();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,7 +37,7 @@ export default function Login() {
   };
 
   const handleGoogle = () => {
-    base44.auth.loginWithProvider("google", returnTo);
+    base44.auth.startGoogle(inviteToken, returnTo);
   };
 
   return (

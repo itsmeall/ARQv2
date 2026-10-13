@@ -1,0 +1,12 @@
+Options -Indexes
+RewriteEngine On
+
+# Keep PHP source, schema, and local configuration outside direct web responses.
+# Route every /api request through the single front controller.
+RewriteRule ^api(?:/.*)?$ api/public/index.php [QSA,END]
+
+# Serve the static Vite build and send client-side routes to React.
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+RewriteRule ^ index.html [L]

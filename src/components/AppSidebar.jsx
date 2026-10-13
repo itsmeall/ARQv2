@@ -10,11 +10,13 @@ import {
   Wallet,
   Settings,
   Building2,
+  UserCheck,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { cn } from '@/lib/utils';
 import { initials } from '@/lib/format';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export function navForRole(session) {
   if (session.appRole === 'owner_admin' || session.appRole === 'admin') {
@@ -29,7 +31,10 @@ export function navForRole(session) {
       { label: 'Keuangan', path: '/laporan', icon: Wallet },
       { label: 'Pengaturan', path: '/pengaturan', icon: Settings },
     ];
-    if (session.isPlatformAdmin) items.unshift({ label: 'Perusahaan', path: '/perusahaan', icon: Building2 });
+    if (session.isPlatformAdmin) items.unshift(
+      { label: 'Perusahaan', path: '/perusahaan', icon: Building2 },
+      { label: 'Persetujuan', path: '/admin/pendaftaran', icon: UserCheck },
+    );
     return items;
   }
   if (session.appRole === 'reseller') {
@@ -53,7 +58,10 @@ export function navForRole(session) {
     ];
   }
   if (session.isPlatformAdmin) {
-    return [{ label: 'Perusahaan', path: '/perusahaan', icon: Building2 }];
+    return [
+      { label: 'Perusahaan', path: '/perusahaan', icon: Building2 },
+      { label: 'Persetujuan', path: '/admin/pendaftaran', icon: UserCheck },
+    ];
   }
   return [];
 }
@@ -74,6 +82,20 @@ export default function AppSidebar({ session, onNavigate }) {
           </p>
         </div>
       </div>
+
+      {session.memberships?.length > 1 ? (
+        <div className="space-y-2">
+          <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Perusahaan aktif</p>
+          <Select value={session.activeTenantId || ''} onValueChange={session.setActiveTenant}>
+            <SelectTrigger aria-label="Pilih perusahaan aktif"><SelectValue placeholder="Pilih perusahaan" /></SelectTrigger>
+            <SelectContent>
+              {session.memberships.map((membership) => (
+                <SelectItem key={membership.tenant_id} value={membership.tenant_id}>{membership.tenant_name || membership.tenant_id}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      ) : null}
 
       <nav className="flex flex-1 flex-col gap-1">
         {items.map((item) => (

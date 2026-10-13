@@ -15,7 +15,7 @@ import RecordSaleDialog from '@/components/dialogs/RecordSaleDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { formatDate, formatDateTime, formatIDR, formatIDRShort } from '@/lib/format';
+import { formatDateTime, formatIDR, formatIDRShort } from '@/lib/format';
 
 export default function ResellerDetail() {
   const { memberId } = useParams();

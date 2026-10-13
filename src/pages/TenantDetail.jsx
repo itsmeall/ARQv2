@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Mail, Pencil, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Mail, Pencil, Plus, Trash2, UserCheck } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useSession } from '@/lib/session';
+import { apiRequest } from '@/api/phpClient';
 import PageHeader from '@/components/PageHeader';
 import StatusBadge from '@/components/StatusBadge';
 import EmptyState from '@/components/EmptyState';
@@ -17,7 +18,7 @@ import { formatDate, formatDateTime } from '@/lib/format';
 
 export default function TenantDetail() {
   const { tenantId } = useParams();
-  const { displayName } = useSession();
+  const { displayName, isPlatformAdmin } = useSession();
   const [tenant, setTenant] = useState(null);
   const [members, setMembers] = useState([]);
   const [customers, setCustomers] = useState([]);
@@ -25,6 +26,7 @@ export default function TenantDetail() {
   const [editDialog, setEditDialog] = useState(false);
   const [memberDialog, setMemberDialog] = useState({ open: false, member: null });
   const [confirm, setConfirm] = useState(null);
+  const [activation, setActivation] = useState({ busyId: null, link: '', error: '' });
 
   const load = useCallback(async () => {
     if (!tenantId) return;
@@ -51,6 +53,30 @@ export default function TenantDetail() {
       email: member.email,
     });
     load();
+  };
+
+  const activateLegacyMember = async (member) => {
+    setActivation({ busyId: member.id, link: '', error: '' });
+    try {
+      const result = await apiRequest('/admin/members/activate', {
+        method: 'POST',
+        csrf: true,
+        body: {
+          legacy_member_id: member.legacy_member_id,
+          tenant_id: tenantId,
+          email: member.email,
+          full_name: member.name || member.email,
+          phone: member.phone || '',
+          app_role: member.app_role,
+          customer_id: member.customer_id || null,
+          commission_rate: member.commission_rate ?? null,
+        },
+      });
+      setActivation({ busyId: null, link: `${window.location.origin}/#invite_token=${result.invitation_token}`, error: '' });
+      await load();
+    } catch (error) {
+      setActivation({ busyId: null, link: '', error: error.message || 'Aktivasi anggota lama gagal.' });
+    }
   };
 
   if (loading && !tenant) return <LoadingScreen label="Memuat perusahaan…" />;
@@ -163,6 +189,18 @@ export default function TenantDetail() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
+                          {isPlatformAdmin && member.legacy_member_id && !member.account_linked ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={activation.busyId === member.id}
+                              onClick={() => activateLegacyMember(member)}
+                              title="Tinjau dan aktifkan anggota lama ini satu per satu"
+                            >
+                              <UserCheck className="mr-1 h-4 w-4" />
+                              {activation.busyId === member.id ? 'Memproses…' : 'Aktifkan lama'}
+                            </Button>
+                          ) : null}
                           <Button
                             variant="ghost"
                             size="icon"
@@ -187,6 +225,14 @@ export default function TenantDetail() {
                 </TableBody>
               </Table>
             )}
+            {activation.error ? <p className="px-4 py-3 text-sm text-destructive">{activation.error}</p> : null}
+            {activation.link ? (
+              <div className="flex flex-wrap items-center gap-2 border-t border-border/70 p-4">
+                <p className="text-sm">Akun lama disiapkan satu per satu. Kirim tautan ini kepada anggota:</p>
+                <code className="max-w-full break-all rounded bg-muted px-2 py-1 text-xs">{activation.link}</code>
+                <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(activation.link)}>Salin tautan</Button>
+              </div>
+            ) : null}
           </CardContent>
         </Card>
       </div>

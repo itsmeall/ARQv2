@@ -34,6 +34,7 @@ import MitraSales from '@/pages/mitra/MitraSales';
 import MitraCommission from '@/pages/mitra/MitraCommission';
 import TeknisiTickets from '@/pages/teknisi/TeknisiTickets';
 import AkunInvoices from '@/pages/akun/AkunInvoices';
+import RegistrationApprovals from '@/pages/admin/RegistrationApprovals';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -103,6 +104,7 @@ const AuthenticatedApp = () => {
             <Route element={<RoleRoute platformAdmin />}>
               <Route path="/perusahaan" element={<Tenants />} />
               <Route path="/perusahaan/:tenantId" element={<TenantDetail />} />
+              <Route path="/admin/pendaftaran" element={<RegistrationApprovals />} />
             </Route>
           </Route>
         </Route>

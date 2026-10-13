@@ -1,12 +1,2 @@
-import { createClient } from '@base44/sdk';
-import { appParams } from '@/lib/app-params';
-
-const { appId, token, functionsVersion, appBaseUrl } = appParams;
-
-export const base44 = createClient({
-  appId,
-  token,
-  functionsVersion,
-  serverUrl: '',
-  appBaseUrl
-});
+// Keep the established import path while the app moves its data/auth calls to PHP.
+export { base44 } from '@/api/phpClient';
